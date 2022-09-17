@@ -1,8 +1,10 @@
 import pygame as pg
 import pygame.display as display
 WIDTH=993
-TILESIZE=20
+TILESIZE=18
 HEIGHT= 804
+BGCOLOR = (40, 40, 40)
+LIGHTGREY = (100, 100, 100)
 import numpy as np
 from pygame.locals import *
 
@@ -38,7 +40,7 @@ display.update()
 
 gameExit = False
 
-world = World(10, 10)
+world = World(45, 55)
 world.create_world()
 
 print(len(world.matrix))
@@ -50,7 +52,11 @@ while not gameExit:
 
     gameDisplay.fill(white)
     gameDisplay.blit(land_surface, (0, 0))
-    pg.draw.rect(gameDisplay, black, [86, 180, 20, 20],3)
+    pg.draw.rect(gameDisplay, black, [86, 180, 18, 18],3)
+    for x in range(0, WIDTH, TILESIZE):
+       pg.draw.line(gameDisplay, LIGHTGREY, (x, 0), (x, HEIGHT))
+    for y in range(0, HEIGHT, TILESIZE):
+       pg.draw.line(gameDisplay, LIGHTGREY, (0, y), (WIDTH, y))
 
     display.update()
 

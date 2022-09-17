@@ -2,12 +2,15 @@ import numpy as np
 import pygame as pg
 import sys
 import pygame.display as display
+from os import path
 from pygame.locals import *
 WIDTH=993
 TILESIZE=18
 HEIGHT= 804
 BGCOLOR = (40, 40, 40)
 LIGHTGREY = (100, 100, 100)
+WHITE=(250,250,250)
+BLACK=(0,0,0)
 
 file = 'sprites/map.png'
 class Player:
@@ -28,7 +31,21 @@ class Player:
         self.rect.x = self.x * TILESIZE
         self.rect.y = self.y * TILESIZE
 
-class Game:
+class WorldTile:
+    def __init__(self, _is_wall):
+        self.isWall = _is_wall #casa
+        self.value = 0
+
+class World:
+    def __init__(self, width, height):
+        self.matrix = None
+        self.width = width
+        self.height = height
+
+    def create_world(self):
+        self.matrix = [[WorldTile(True)] * self.width] * self.height #crear matrix
+
+class Game():
     def __init__(self):
         pg.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -38,11 +55,18 @@ class Game:
         self.load_data()
 
     def load_data(self):
-        pass
+        game_folder = path.dirname(__file__)
+        self.map_data = []
+        with open(path.join(game_folder, 'mapas_matrices/map/path.txt'), 'rt') as f:
+            for line in f:
+                self.map_data.append(line)
 
     def new(self):
         land_surface = pg.image.load('sprites/map.png')
         gameDisplay.blit(land_surface, (0, 0))
+        world = World(45, 55)
+        world.create_world()
+        print(len(world.matrix))
 
     def run(self):
         self.playing = True
@@ -79,4 +103,5 @@ while True:
     gameDisplay = display.set_mode((WIDTH, HEIGHT))
     g.new()
     g.run()
+
 
