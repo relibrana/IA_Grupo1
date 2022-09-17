@@ -4,18 +4,25 @@
 # Press Mayús+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
+from random import randint
 import pygame
 arial=pygame.font.match_font('arial')
 
 class Adulto(pygame.sprite.Sprite):
-    def __init__(self, width,height,pos_x,pos_y,img):
+    def __init__(self, width,height,pos_x,pos_y,img,prob):
         super().__init__()
         self.image=pygame.Surface([width,height])
         self.image=img
         self.rect=self.image.get_rect()
         self.rect.center=[pos_x,pos_y]
+        self.problem=prob
     def change_pos(self,newX,newY):
+        self.kill()
         self.rect.center=[newX,newY]
+    def get_problem(self):
+        return self.problem
+    def change_problem(self,newP):
+        self.problem=newP
 
 def pushInfo_Text2(posInd,s:str):
     with open(s,'w+',newline='\n') as f:
@@ -152,7 +159,13 @@ if __name__ == '__main__':
 
     textos={
         1:"Ayudame con mis compras del supermercado",
-        2:"Aasdn la farmacia"
+        2:"Ayudame con mis compras en la farmacia",
+        3:"Llevale este presente a la casa de mi nieto"
+    }
+    posiciones={
+        1:[810,695],
+        2:[192,585],
+        3:[633,558]
     }
     graph = {}
     edges = 0
@@ -233,7 +246,8 @@ if __name__ == '__main__':
     adulto_x = ad.get_width()
     adulto_y = ad.get_height()
     
-    adulto=Adulto(adulto_x,adulto_y,810,695,ad)
+    last=1
+    adulto=Adulto(adulto_x,adulto_y,810,695,ad,1)
     adulto_sprite=pygame.sprite.Group()
     adulto_sprite.add(adulto)
     
@@ -339,11 +353,22 @@ if __name__ == '__main__':
         if player_rect.collidepoint(dic[follow][0]) and len(path) != 0:
             path.pop(0)
             
-        if len(path)<850:
-            for i in adulto_sprite:
-                adulto_sprite.remove(i)
-                
-            # adulto.change_pos(300,300)
+        if len(path)==0:
+            # adulto.kill()
+            # adulto_sprite.update()
+            while(1):
+                num=randint(1,3)
+                if(num==last):
+                    continue
+                else:
+                    last=num
+                    break
+            positions=posiciones[randint(1,3)]
+            adulto.change_pos(positions[0],positions[1])
+            adulto_sprite.add(adulto)
+            graph_fin=positions[1]*965+positions[0]
+            print(positions[1]*965+positions[0])
+            path = graph1.a_star_algorithm(graph_init, graph_fin)
             # adulto_sprite.add(adulto)
 
         if graph_visible:
@@ -362,10 +387,12 @@ if __name__ == '__main__':
         #######
         # print(adulto_sprite)
         if len(adulto_sprite)!=0:
-            adulto_sprite.draw(land_surface)
+            adulto_sprite.draw(screen)
+            
+            # adulto_sprite.update()
+
         
         # if aux==1:
-        adulto_sprite.update()
         cartel(screen,arial,textos[1])
         
         #     aux=aux+1
