@@ -62,8 +62,9 @@ class World:
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
                 if self.matrix[i][j].isWall:
-                    pg.draw.rect(surface, LIGHT_GREY,
-                                 [self.matrix[i][j].x_pos, self.matrix[i][j].y_pos - TILE_SIZE, TILE_SIZE, TILE_SIZE], 1)
+                    continue
+                    # pg.draw.rect(surface, LIGHT_GREY,
+                    #              [self.matrix[i][j].x_pos, self.matrix[i][j].y_pos - TILE_SIZE, TILE_SIZE, TILE_SIZE], 1)
                 else:
                     pg.draw.rect(surface, BLACK,
                                  [self.matrix[i][j].x_pos, self.matrix[i][j].y_pos - TILE_SIZE, TILE_SIZE, TILE_SIZE], 1)
