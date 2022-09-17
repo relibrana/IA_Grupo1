@@ -111,7 +111,7 @@ if __name__ == '__main__':
     with open('mapas_matrices/matriz_mapa_test.txt') as f:
         L = []
         for line in f:
-            L.append([int(x) for x in line.split()])
+            L.append([int(x) for x in line.split()]) #pasarle world tile.value
 
         shape_y = len(L)
         shape_x = len(L[0])

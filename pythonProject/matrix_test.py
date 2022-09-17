@@ -1,5 +1,6 @@
 import pygame as pg
 import pygame.display as display
+import pickle
 
 WIDTH = 993
 TILE_SIZE = 18
@@ -8,13 +9,18 @@ BG_COLOR = (40, 40, 40)
 LIGHT_GREY = (100, 100, 100)
 BLACK = (0, 0, 0)
 
+world_data=[]
 
+for row in range(55):
+	r = [0] * 45
+	world_data.append(r)
 def draw_tile(surface, tile):
     print(tile.x_pos, tile.y_pos)
     pg.draw.rect(surface, LIGHT_GREY, [tile.x_pos, tile.y_pos, TILE_SIZE, TILE_SIZE])
 
 
 # element de la matrix
+##lista de listas
 class WorldTile:
     def __init__(self, _is_wall):
         self.isWall = _is_wall  # casa
@@ -51,6 +57,34 @@ class World:
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
                 print(self.matrix[i][j].x_pos, self.matrix[i][j].y_pos)
+class Button():
+	def __init__(self, x, y, image):
+		self.image = image
+		self.rect = self.image.get_rect()
+		self.rect.topleft = (x, y)
+		self.clicked = False
+
+	def draw(self):
+		action = False
+
+		#get mouse position
+		pos = pg.mouse.get_pos()
+
+		#check mouseover and clicked conditions
+		if self.rect.collidepoint(pos):
+			if pg.mouse.get_pressed()[0] == 1 and self.clicked == False:
+				action = True
+				self.clicked = True
+
+		if pg.mouse.get_pressed()[0] == 0:
+			self.clicked = False
+
+		#draw button
+		gameDisplay.blit(self.image, (self.rect.x, self.rect.y))
+
+		return action
+
+save_button = Button(WIDTH // 2 - 150, HEIGHT - 80, pg.image.load('sprites/pikachu_pequenio.png'))
 
 
 pg.init()
@@ -76,9 +110,12 @@ for col in range(len(world.matrix)):
 # world.print_world()
 
 while not gameExit:
+
+
     for event in pg.event.get():
         if event.type == pg.QUIT:
             gameExit = True
+
         if event.type == pg.MOUSEBUTTONDOWN:
             for col in range(len(world.matrix)):
                 for row in range(len(world.matrix[col])):
@@ -87,9 +124,18 @@ while not gameExit:
                             and temp.y_pos <= event.pos[1] < temp.y_pos + TILE_SIZE:
                         print("clicked tile ", col, row)
                         temp.set_wall(True)
+            pos = pg.mouse.get_pos()
+            x = pos[0] // TILE_SIZE
+            y = pos[1] // TILE_SIZE
+            if pg.mouse.get_pressed()[0] == 1:
+                world_data[x][y] += 1
+                if world_data[x][y]>2:
+                    world_data[x][y]=0
+            print(world_data)
 
     gameDisplay.fill(white)
     gameDisplay.blit(land_surface, (0, 0))
+
 
     for col in range(len(world.matrix)):
         for row in range(len(world.matrix[col])):
@@ -100,6 +146,13 @@ while not gameExit:
                 pg.draw.rect(gameDisplay, LIGHT_GREY,
                              [world.matrix[col][row].x_pos, world.matrix[col][row].y_pos, TILE_SIZE, TILE_SIZE], 1)
 
+    if save_button.draw():
+        # save level data
+        print(world.matrix)
+        pickle_out = open(f'world_data.txt', 'wb')
+        pickle.dump(world_data, pickle_out)
+        pickle_out.close()
+        print(world_data)
     display.update()
 
 pg.quit()
