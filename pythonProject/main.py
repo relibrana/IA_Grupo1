@@ -4,8 +4,10 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 import pygame
+import MatrixWorld
 import numpy as np
 from collections import deque
+
 
 # Press the green button in the gutter to run the script.
 class Graph:
@@ -105,6 +107,7 @@ class Graph:
         print('Path does not exist!')
         return None
 
+
 if __name__ == '__main__':
     #########################
     with open('world_data.txt') as f:
@@ -161,13 +164,18 @@ if __name__ == '__main__':
 
     #print(graph[277239])
     graph_init = 460
-    graph_fin = 1456
+    graph_fin = 460
+
     if graph1.a_star_algorithm(graph_init, graph_fin) != None:
         path = graph1.a_star_algorithm(graph_init, graph_fin)
 
     print(shape_x, shape_y)
     #########################
     pygame.init()
+
+    world = MatrixWorld.World(45, 55)
+    world.load_map_tile()
+
     # Change
     # W, H = shape_x, shape_y
     W, H = 993, 804
@@ -247,9 +255,9 @@ if __name__ == '__main__':
     sp_pl_y = 0
 
     pixel_arr = pygame.PixelArray(player)
-    player1 = pixel_arr[int(player_x/9)*sp_pl_x:int(player_x/9)*(sp_pl_x+1) + 15,
+    player1 = pixel_arr[int(player_x/9)*sp_pl_x:int(player_x/9)*(sp_pl_x+1),
                         int(player_y/4)*sp_pl_y:int(player_y/4)*(sp_pl_y+1) + 50].make_surface()
-    player_rect = player1.get_rect(midbottom=(dic[graph_init][0][0] + 20, dic[graph_init][0][1] + 20))
+    player_rect = player1.get_rect(midbottom=(dic[graph_init][0][0], dic[graph_init][0][1] + 20))
     pygame.PixelArray.close(pixel_arr)
     ##########################
     step = 2
@@ -258,7 +266,7 @@ if __name__ == '__main__':
     #path = [212291, 212292, 212293, 212294]
     path2 = path[::-1]
     path = path + path2
-    follow = path[0]
+    follow = None
     while True:
         # Follow
         if path:
@@ -271,9 +279,22 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                temp = world.clicked_tile(event)
+                if temp is not None:
+                    print(temp[0], temp[1])
+                    graph_fin = temp[1]+temp[0]*shape_x
+                    node = graph1.a_star_algorithm(graph_init, graph_fin)
+                    if node is not None:
+                        path = node
+                        follow = path[0]
+                        step = 5
+                        ad = 1
+
         # Show
         screen.fill([255, 255, 255])
         screen.blit(land_surface, (0, 0))
+        world.draw_world(screen)
         screen.blit(player1, player_rect)
 
         """
@@ -304,6 +325,7 @@ if __name__ == '__main__':
             path.pop(0)"""
         if len(path) != 0 and (player_rect.centerx - step <= dic[follow][0][0] <= player_rect.centerx + step) and (player_rect.centery - step <= dic[follow][0][1] <= player_rect.centery + step):
             path.pop(0)
+            graph_init = graph_fin
 
         if graph_visible:
             for i in range(shape_x*shape_y):
