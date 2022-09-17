@@ -160,7 +160,7 @@ if __name__ == '__main__':
     #print(graph[277239])
     graph_init = 271
     graph_fin = 39005
-    if graph1.a_star_algorithm(graph_init, graph_fin) != None:
+    if graph1.a_star_algorithm(graph_init, graph_fin) is not None:
         path = graph1.a_star_algorithm(graph_init, graph_fin)
 
     print(shape_x, shape_y)
