@@ -5,6 +5,7 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 import pygame
+arial=pygame.font.match_font('arial')
 
 class Adulto(pygame.sprite.Sprite):
     def __init__(self, width,height,pos_x,pos_y,img):
@@ -13,6 +14,8 @@ class Adulto(pygame.sprite.Sprite):
         self.image=img
         self.rect=self.image.get_rect()
         self.rect.center=[pos_x,pos_y]
+    def change_pos(self,newX,newY):
+        self.rect.center=[newX,newY]
 
 def pushInfo_Text2(posInd,s:str):
     with open(s,'w+',newline='\n') as f:
@@ -23,6 +26,8 @@ def pushInfo_Text2(posInd,s:str):
             except:
                 continue
 # Press the green button in the gutter to run the script.
+
+
 class Graph:
     def __init__(self, adjac_lis):
         self.adjac_lis = adjac_lis
@@ -120,6 +125,18 @@ class Graph:
         print('Path does not exist!')
         return None
 
+def cartel(ventana,fuente,texto):
+    font=pygame.font.Font(fuente,15)
+    
+    surf=font.render(texto,True,(0,0,0))
+    rectangulo=surf.get_rect()
+    
+    # rectangulo.center(500,500)
+    rectangulo.x=20
+    rectangulo.y=700
+    ventana.blit(surf,rectangulo)
+
+
 if __name__ == '__main__':
     #########################
     with open('mapas_matrices/matriz_mapa_test.txt') as f:
@@ -133,10 +150,10 @@ if __name__ == '__main__':
         matrix = L
         #print(len(matrix[0]))
 
-    # textos={
-    #     1:fuente.render("Ayudame con mis compras del supermercado",True,(255,255,255)),
-    #     2:fuente.render("Ayudame con mis compras en la farmacia",True,(255,255,255))
-    # }
+    textos={
+        1:"Ayudame con mis compras del supermercado",
+        2:"Aasdn la farmacia"
+    }
     graph = {}
     edges = 0
     y_temp = -1
@@ -203,7 +220,9 @@ if __name__ == '__main__':
     land_surface = pygame.transform.scale(land_surface, (W, H))
 
     player = pygame.image.load('sprites/professor_walk_cycle_no_hat.png').convert_alpha()
+    
     ad_original=pygame.image.load('sprites/adulto.png')
+    cuadro_texto=pygame.image.load('sprites/cartel_texto.png')
     ad=pygame.transform.scale(ad_original,(30,30))
     
     #########################
@@ -217,7 +236,8 @@ if __name__ == '__main__':
     adulto=Adulto(adulto_x,adulto_y,810,695,ad)
     adulto_sprite=pygame.sprite.Group()
     adulto_sprite.add(adulto)
-    land_surface.blit(textos[1],(10,10))
+    
+    
     #########################
     # Matrix
     #shape_x = int(W/(player_x/9))
@@ -270,10 +290,13 @@ if __name__ == '__main__':
     ad = 1
     # Path from algorithm
     #path = [212291, 212292, 212293, 212294]
-    path2 = path[::-1]
-    path = path + path2
+    # path2 = path[::-1]
+    # path = path + path2
+    path = path
     follow = path[0]
+    aux=1
     while True:
+
         # Follow
         if path:
             follow = path[0]
@@ -287,6 +310,7 @@ if __name__ == '__main__':
                 exit()
         # Show
         screen.blit(land_surface, (0, 0))
+        screen.blit(cuadro_texto,(5,675))
         screen.blit(player1, player_rect)
 
         """
@@ -314,6 +338,13 @@ if __name__ == '__main__':
         # Collision
         if player_rect.collidepoint(dic[follow][0]) and len(path) != 0:
             path.pop(0)
+            
+        if len(path)<850:
+            for i in adulto_sprite:
+                adulto_sprite.remove(i)
+                
+            # adulto.change_pos(300,300)
+            # adulto_sprite.add(adulto)
 
         if graph_visible:
             for i in range(shape_x*shape_y):
@@ -329,6 +360,18 @@ if __name__ == '__main__':
         pygame.PixelArray.close(pixel_arr)
         
         #######
-        adulto_sprite.draw(land_surface)
+        # print(adulto_sprite)
+        if len(adulto_sprite)!=0:
+            adulto_sprite.draw(land_surface)
+        
+        # if aux==1:
+        adulto_sprite.update()
+        cartel(screen,arial,textos[1])
+        
+        #     aux=aux+1
+        # elif aux==2:
+        #     cartel(screen,arial,textos[2])
+        #     aux=1
+        
         pygame.display.update()
         clock.tick(60)
