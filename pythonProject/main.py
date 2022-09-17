@@ -105,6 +105,7 @@ class Graph:
         print('Path does not exist!')
         return None
 
+
 if __name__ == '__main__':
     #########################
     with open('mapas_matrices/matriz_mapa_test.txt') as f:
