@@ -105,19 +105,21 @@ class Graph:
         print('Path does not exist!')
         return None
 
-
 if __name__ == '__main__':
     #########################
-    with open('mapas_matrices/matriz_mapa_test.txt') as f:
+    with open('world_data.txt') as f:
         L = []
         for line in f:
-            L.append([int(x) for x in line.split()]) #pasarle world tile.value
+            L.append([int(x) for x in line.split()])
+        # Change
+        # L = np.asarray(L)
+        # L = np.transpose(L)
 
         shape_y = len(L)
         shape_x = len(L[0])
 
         matrix = L
-        #print(len(matrix[0]))
+        # print(len(matrix[0]))
 
     graph = {}
     edges = 0
@@ -158,15 +160,17 @@ if __name__ == '__main__':
     graph1 = Graph(graph)
 
     #print(graph[277239])
-    graph_init = 271
-    graph_fin = 39005
-    if graph1.a_star_algorithm(graph_init, graph_fin) is not None:
+    graph_init = 460
+    graph_fin = 1456
+    if graph1.a_star_algorithm(graph_init, graph_fin) != None:
         path = graph1.a_star_algorithm(graph_init, graph_fin)
 
     print(shape_x, shape_y)
     #########################
     pygame.init()
-    W, H = shape_x, shape_y
+    # Change
+    # W, H = shape_x, shape_y
+    W, H = 993, 804
     screen = pygame.display.set_mode((W, H))
     pygame.display.set_caption("IA")
     clock = pygame.time.Clock()
@@ -179,28 +183,41 @@ if __name__ == '__main__':
         """
     ################
     # Sprite player
-    land_surface = pygame.image.load('sprites/Escenario.png')
+
+    land_surface = pygame.image.load('sprites/map.png')
     land_surface = pygame.transform.scale(land_surface, (W, H))
 
     player = pygame.image.load('sprites/professor_walk_cycle_no_hat.png').convert_alpha()
-
-    #########################
-    # Dimensions
     player_x = player.get_width()
     player_y = player.get_height()
+    """player_x = player_x*0.9
+    player_y = player_y*0.9
+    player = pygame.transform.scale(player, (player_x, player_y))"""
+    #########################
+    # Dimensions
 
 
     #########################
     # Matrix
-    #shape_x = int(W/(player_x/9))
-    #shape_y = int(H/(player_y/4))
-    shape_x = W
-    shape_y = H
+    # shape_x = int(W/(player_x/9))
+    # shape_y = int(H/(player_y/4))
+    """
+        # Change
+        # shape_x = W
+        # shape_y = H
+    """
+    shape_x = shape_x
+    shape_y = shape_y
     # matrix = np.zeros((shape_y, shape_x), dtype=int)
     # matrix[1:-1, 1:-1] = 1
     dic = {}
     y_temp = -1
     # Graph
+    print(shape_x, shape_y)
+
+    each_shape_x = W/shape_x
+    each_shape_y = H/shape_y
+
     for i in range(shape_x*shape_y):
         x_temp = (i % shape_x)
         if x_temp == 0:
@@ -209,7 +226,12 @@ if __name__ == '__main__':
         """dic[i] = [(int(player_x/18) + int(player_x/9) * x_temp,
                    int(player_y/8) + int(player_y/4) * y_temp)
             , (y_temp, x_temp)]"""
-        dic[i] = [(x_temp, y_temp), (y_temp, x_temp)]
+        dic[i] = [(int(each_shape_x / 2) + int(each_shape_x) * x_temp,
+                   int(each_shape_y / 2) + int(each_shape_y) * y_temp)
+            , (y_temp, x_temp)]
+
+        # Change
+        """dic[i] = [(x_temp, y_temp), (y_temp, x_temp)]"""
     """
     for i in range(N):
         c = 150
@@ -219,18 +241,18 @@ if __name__ == '__main__':
     """
     graph_visible = False
     #print(shape_x, " ", shape_y)
-    #print(dic)
+    print(dic)
     #########################
     sp_pl_x = 0
     sp_pl_y = 0
 
     pixel_arr = pygame.PixelArray(player)
-    player1 = pixel_arr[int(player_x/9)*sp_pl_x:int(player_x/9)*(sp_pl_x+1),
-                        int(player_y/4)*sp_pl_y:int(player_y/4)*(sp_pl_y+1)].make_surface()
+    player1 = pixel_arr[int(player_x/9)*sp_pl_x:int(player_x/9)*(sp_pl_x+1) + 15,
+                        int(player_y/4)*sp_pl_y:int(player_y/4)*(sp_pl_y+1) + 50].make_surface()
     player_rect = player1.get_rect(midbottom=(dic[graph_init][0][0] + 20, dic[graph_init][0][1] + 20))
     pygame.PixelArray.close(pixel_arr)
     ##########################
-    step = 4
+    step = 2
     ad = 1
     # Path from algorithm
     #path = [212291, 212292, 212293, 212294]
@@ -250,6 +272,7 @@ if __name__ == '__main__':
                 pygame.quit()
                 exit()
         # Show
+        screen.fill([255, 255, 255])
         screen.blit(land_surface, (0, 0))
         screen.blit(player1, player_rect)
 
@@ -258,25 +281,28 @@ if __name__ == '__main__':
         # pos_x_pika += step
         # pika_rect.left += step
         """
-        if player_rect.centerx < dic[follow][0][0] - step:
-            player_rect.centerx += step
-            sp_pl_y = 3
-        elif player_rect.centerx > dic[follow][0][0] + step:
-            player_rect.centerx -= step
-            sp_pl_y = 1
+        if sp_pl_x < 8:
+            sp_pl_x += ad
+        else:
+            sp_pl_x = 0
         if player_rect.centery < dic[follow][0][1] - step:
             player_rect.centery += step
             sp_pl_y = 2
         elif player_rect.centery > dic[follow][0][1] + step:
             player_rect.centery -= step
             sp_pl_y = 0
-        if sp_pl_x < 8:
-            sp_pl_x += ad
-        else:
-            sp_pl_x = 0
+        elif player_rect.centerx < dic[follow][0][0] - step:
+            player_rect.centerx += step
+            sp_pl_y = 3
+        elif player_rect.centerx > dic[follow][0][0] + step:
+            player_rect.centerx -= step
+            sp_pl_y = 1
+
 
         # Collision
-        if player_rect.collidepoint(dic[follow][0]) and len(path) != 0:
+        """if player_rect.collidepoint(dic[follow][0]) and len(path) != 0:
+            path.pop(0)"""
+        if len(path) != 0 and (player_rect.centerx - step <= dic[follow][0][0] <= player_rect.centerx + step) and (player_rect.centery - step <= dic[follow][0][1] <= player_rect.centery + step):
             path.pop(0)
 
         if graph_visible:
@@ -294,5 +320,5 @@ if __name__ == '__main__':
 
         #######
         pygame.display.update()
-        clock.tick(60)
+        clock.tick(40)
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
