@@ -7,11 +7,9 @@ from random import randint
 import pygame
 import MatrixWorld
 
-arial = pygame.font.match_font('arial')
-
-
 # Press the green button in the gutter to run the script.
 class Graph:
+    #InITIALIZE THE GRAPH
     def __init__(self, adjac_lis):
         self.adjac_lis = adjac_lis
         self.H = {}
@@ -19,6 +17,7 @@ class Graph:
         for i in range(len(self.adjac_lis)):
             self.H[lis[i]] = 1
 
+    #GET ADJACENCY LIST
     def get_neighbors(self, v):
         return self.adjac_lis[v]
 
@@ -33,6 +32,7 @@ class Graph:
 
         return self.H[n]
 
+    #A-STAR ALGORITHM
     def a_star_algorithm(self, start, stop):
         # In this open_lst is a lisy of nodes which have been visited, but who's
         # neighbours haven't all been always inspected, It starts off with the start
@@ -109,7 +109,9 @@ class Graph:
         return None
 
 
-class Adulto(pygame.sprite.Sprite):
+
+class Adult(pygame.sprite.Sprite):
+    #Initialize adult class
     def __init__(self, width, height, pos_x, pos_y, img, prob):
         super().__init__()
         self.image = pygame.Surface([width, height])
@@ -118,94 +120,81 @@ class Adulto(pygame.sprite.Sprite):
         self.rect.center = [pos_x, pos_y]
         self.problem = prob
 
+    #Change sprite's position
     def change_pos(self, newX, newY):
-        self.kill()
-        self.rect.center = [newX, newY]
+        self.kill()#Once we change pos, we use the kill function to delete our sprite from any list where is included
+        self.rect.center = [newX, newY] #Change the rect center with new coordinates
 
     def get_problem(self):
-        return self.problem
+        return self.problem #Return the type of problem the adult has
 
     def change_problem(self, newP):
-        self.problem = newP
+        self.problem = newP #Change the problem type
 
     def get_rect(self):
-        return self.rect
+        return self.rect #Get the rect of the adult, this will help to check collisions
 
-
-def cartel(ventana, fuente, texto):
-    font = pygame.font.Font(fuente, 15)
-
-    surf = font.render(texto, True, (0, 0, 0))
-    rectangulo = surf.get_rect()
-
-    # rectangulo.center(500,500)
-    rectangulo.x = 20
-    rectangulo.y = 700
-    ventana.blit(surf, rectangulo)
-
-
-def pushInfo_Text2(posInd, s: str):
-    with open(s, 'w+', newline='\n') as f:
-        for i in posInd.keys():
-            try:
-                int(i)
-                f.write(f"{i}: " + str(posInd.get(i)) + "\n")
-            except:
-                continue
 
 
 if __name__ == '__main__':
     #########################
+    #Read matrix, this will get us the possible roads
     with open('world_data.txt') as f:
         L = []
         for line in f:
             L.append([int(x) for x in line.split()])
-        # Change
-        # L = np.asarray(L)
-        # L = np.transpose(L)
 
         shape_y = len(L)
         shape_x = len(L[0])
-
         matrix = L
-        # print(len(matrix[0]))
 
-    # ultimo
+    
+    ##########################################################
+    # #INITIAL DATA OF PROBLEM TEXTS#
+    # textos = {
+    #     1: "Ayudame con mis compras del supermercado",
+    #     2: "Ayudame con mis compras en la farmacia",
+    #     3: "Llevale este presente a la casa de mi nieto (35)",
+    #     4: "Recoge mis resultados medicos del hospital"
+    # }
+    #POSITIONS WHERE THE ADULT COULD BE LOCATED#
+    positions = {
+        1: (801, 711),
+        2: (192, 585),
+        3: (633, 558),
+        4: (346, 617),
+        5: (117, 315),
+        6: (45, 423),
+        7: (585, 441),
+        8: (783, 405),
+        9: (405, 261),
+        10: (873, 459),
+        11: (729, 279),
+        12: (171, 387),
+        13: (297, 567),
+        14: (243, 459),
 
-    textos = {
-        1: "Ayudame con mis compras del supermercado",
-        2: "Ayudame con mis compras en la farmacia",
-        3: "Llevale este presente a la casa de mi nieto (35)",
-        4: "Recoge mis resultados medicos del hospital"
     }
-    posiciones = {
-        1: [801, 711],
-        2: [192, 585],
-        3: [633, 558],
-        4: [346, 617],
-        5: [117, 315],
-        6: [45, 423],
-        7: [585, 441],
-        8: [783, 405],
-        9: [405, 261],
-        10: [873, 459],
-        11: [729, 279],
-        12: [171, 387],
-        13: [297, 567],
-        14: [243, 459],
 
-    }
-    lugares = {
-        1: ([423, 585, 33, 23], "supermercado"),  # SUPERMERCADO
-        2: ([243, 284, 15, 13], "farmacia"),  # FARMACIA
-        3: ([81, 477, 26, 4], "casa"),  # CASA
-        4: ([153, 235, 12, 8], "hospital"),  # HOSPITAL
+ 
+    #PLACES OF INTEREST OF THE ADULT#
+    places_of_interest = {
+        1: ([423, 585, 33, 23], "SUPERMARKET"),  # SUPERMARKET
+        2: ([243, 284, 15, 13], "DRUGSTORES"),  # DRUGSTORE
+        3: ([81, 477, 26, 4], "HOME"),  # HOME
+        4: ([153, 235, 12, 8], "HOSPITAL"),  # HOSPITAL
     }
     ##
 
+    #WE INITIALIZE A DICTIONARY
     graph = {}
     edges = 0
     y_temp = -1
+
+    #######################################################################
+    ##WE ITERATE THE MATRIX AND ASSING A NUMERIC ID TO OUR NODES
+    ##THIS ID IS THE RESULT OF MULTIPLIYING THE POSITION OF Y WITH THE WIDTH OF OUR MATRIX
+    ##PLUS THE POSITION OF X
     for i in range(shape_y * shape_x):
         x_temp = (i % shape_x)
         if x_temp == 0:
@@ -237,29 +226,37 @@ if __name__ == '__main__':
                         graph[i].append((i + 1, 1))
                     else:
                         graph[i] = [(i + 1, 1)]
+    ########################################################################
 
-    # print(graph)
+
+
+    ##WE CONVERT OUR DICTIONARY TO A GRAPH CLASS OBJECT
     graph1 = Graph(graph)
-    pushInfo_Text2(graph, "dicitionary.txt")
-    # print(graph[277239])
+    ##WE ASSIGN THE INITIAL POSITION TO OUR PLAYER
     graph_init = 460
     graph_fin = 460
 
+    ##WE USE FOR THE FIRST TIME THE ALGORITHM STAR TO DETERMINE A PATH, IF NO PATH IS AVAILABLE WE DONT CHANGE THE PREVIOUS PATH VALUE
     if graph1.a_star_algorithm(graph_init, graph_fin) != None:
         path = graph1.a_star_algorithm(graph_init, graph_fin)
 
-    # print(shape_x, shape_y)
     #########################
+
     pygame.init()
 
+    ##WE START A CLASS WORLD OBJECT THAT IS IMPLEMENTED ON THE MATRIXWORLD.PY FILE
     world = MatrixWorld.World(45, 55)
+    ##READ MATRIX VALUE AND LOAD IT TO THE OBJECT
     world.load_map_tile()
 
     # Change
     # W, H = shape_x, shape_y
+    ##WIDHT AND HEIGHT OF OUR INITIAL SCREEN
     W, H = 990, 810
     screen = pygame.display.set_mode((W, H))
-    pygame.display.set_caption("IA")
+    ##CHANGE CAPTION OF THE SCREEN
+    pygame.display.set_caption("Help Granny")
+    ##INITIALIZE A CLOCK OBJECT
     clock = pygame.time.Clock()
 
     """
@@ -270,40 +267,53 @@ if __name__ == '__main__':
         """
     ################
     # Sprite player
-
+    
+    ##WE LOAD ALL THE IMAGES WE ARE GONNA NEED FOR THE GAME
     land_surface = pygame.image.load('sprites/map.png')
+    background=pygame.image.load('sprites/fondo_rosa.jpg')
     land_surface = pygame.transform.scale(land_surface, (W, H))
     menu=pygame.image.load('sprites/start.png')
-    pedido_supermercado = pygame.image.load('sprites/pedido_supermercado.png')
-    pedido_nieto = pygame.image.load('sprites/pedido_nieto.png')
-    pedido_farmacia = pygame.image.load('sprites/pedido_farmacia.png')
-    pedido_hospital = pygame.image.load('sprites/pedido_hospital.png')
-
-    pedidos = {
-        1: pedido_supermercado,
-        2: pedido_farmacia,
-        3: pedido_nieto,
-        4: pedido_hospital
+    request_supermarket = pygame.image.load('sprites/pedido_supermercado.png')
+    request_home = pygame.image.load('sprites/pedido_nieto.png')
+    request_drugstore = pygame.image.load('sprites/pedido_farmacia.png')
+    request_hospital_results = pygame.image.load('sprites/pedido_hospital.png')
+    
+    ##WE INITIALIZE IMAGE VALUES, TO EASILY CHANGE THE IMAGE DEPENDING ON THE PROBLEM
+    requests = {
+        1: request_supermarket,
+        2: request_drugstore,
+        3: request_home,
+        4: request_hospital_results
     }
 
+    ##LOAD PLAYER IMAGE
     player = pygame.image.load('sprites/professor_walk_cycle_no_hat.png').convert_alpha()
+    
+    ##GET WIDTH AND HEIGHT FROM THE PLAYER IMAGE
     player_x = player.get_width()
     player_y = player.get_height()
 
-    # Sprite adulto
-    ad_original = pygame.image.load('sprites/adulto.png')
-    ad = pygame.transform.scale(ad_original, (30, 30))
-    adulto_x = ad.get_width()
-    adulto_y = ad.get_height()
+    ##ADULT SPRITE
+    adult_original = pygame.image.load('sprites/adulto.png')
+    adult = pygame.transform.scale(adult_original, (30, 30))
+    adult_x = adult.get_width()
+    adult_y = adult.get_height()
     last = 1
-    adulto = Adulto(adulto_x, adulto_y, 801, 711, ad, 4)
-    adulto_sprite = pygame.sprite.Group()
-    adulto_sprite.add(adulto)
+
+    ##WE INITIALIZE AN ADULT CLASS OBJECT
+    adult = Adult(adult_x, adult_y, 801, 711, adult, 4)
+
+    ##WE CREATE A SPRITE GROUP
+    adult_sprite = pygame.sprite.Group()
+
+    ##WE ADD THE ADULT CLASS OBJECT TO A SPRITE GROUP
+    adult_sprite.add(adult)
     """player_x = player_x*0.9
     player_y = player_y*0.9
     player = pygame.transform.scale(player, (player_x, player_y))"""
     #########################
     # Variable
+    ##WE ARE GONNA USE THIS VARIABLE FOR CONDITIONAL PURPOSES, WE CANT ANALIZE COLLISIONS IF THE PLAYER IS MOVING
     moving = False
     # Dimensions
 
@@ -316,15 +326,13 @@ if __name__ == '__main__':
         # shape_x = W
         # shape_y = H
     """
-    shape_x = shape_x
-    shape_y = shape_y
-    # matrix = np.zeros((shape_y, shape_x), dtype=int)
-    # matrix[1:-1, 1:-1] = 1
+    # shape_x = shape_x
+    # shape_y = shape_y
     dic = {}
     y_temp = -1
     # Graph
-    # print(shape_x, shape_y)
 
+    
     each_shape_x = W / shape_x
     each_shape_y = H / shape_y
 
@@ -350,9 +358,7 @@ if __name__ == '__main__':
         dic[i] = (40 + c * x_temp, 40 + c * y_temp)
     """
     graph_visible = False
-    # print(shape_x, " ", shape_y)
-    # print(dic)
-    #########################
+
     sp_pl_x = 0
     sp_pl_y = 0
 
@@ -364,16 +370,18 @@ if __name__ == '__main__':
     ##########################
     step = 2
     ad = 1
-    # Path from algorithm
-    # path = [212291, 212292, 212293, 212294]
+
     path2 = path[::-1]
     path = path + path2
     follow = None
+    ##THIS VARIABLE WILL HELP TO DETERMINE IF THE PLAYER HAS DONE THE REQUEST BEFORE GOING WITH THE ADULT
     item = False
     start=True
     game=False
 
-    world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3]) \
+
+    ##SET THE OBJECT TILE THAT IS OUR FIRST TARGET, THIS WILL HELP TO DETERMINE WHERE WE GOTTA CLICK ON THE SCREEN
+    world.get_tile_by_index(places_of_interest[adult.get_problem()][0][2], places_of_interest[adult.get_problem()][0][3]) \
         .set_target(True)
 
     while True:
@@ -409,16 +417,17 @@ if __name__ == '__main__':
             if event.type == pygame.MOUSEBUTTONDOWN and game==False:
                 game=True
 
-        # Show
+        # SHOW MENU SCREEN
         if game ==False:
             screen.blit(menu, (0, 0))
         else:
 
-            screen.fill([255, 255, 255])
+            ##PUT BACKGROUND IMAGE, THE SURFACE IMAGE, DRAW THE PLAYER AND THE REQUEST
+            screen.blit(background,(0,0))
             screen.blit(land_surface, (0, 0))
             world.draw_world(screen)
             screen.blit(player1, player_rect)
-            screen.blit(pedidos[adulto.get_problem()], (0, 670))
+            screen.blit(requests[adult.get_problem()], (0, 670))
 
             """
             # Movement
@@ -450,31 +459,13 @@ if __name__ == '__main__':
                 path.pop(0)
                 graph_init = graph_fin
 
-            # if len(path)==0 & help==True:
-            #     while(1):
-            #         num=randint(1,3)
-            #         if(num==last):
-            #             continue
-            #         else:
-            #             last=num
-            #             break
-            #     positions=posiciones[randint(1,3)]
-            #     adulto.change_pos(positions[0],positions[1])
-            #     adulto_sprite.add(adulto)
-            #     graph_fin=positions[1]*965+positions[0]
-            #     print(positions[1]*965+positions[0])
-            #     path = graph1.a_star_algorithm(graph_init, graph_fin)
-            #     help=False
-            #     # adulto_sprite.add(adulto)
+            ##WE CREATE RECTS TO CHECK COLLITIONS
+            place_rect = pygame.rect.Rect(places_of_interest[adult.get_problem()][0][0], places_of_interest[adult.get_problem()][0][1], 5, 5)
+            play_rect = pygame.rect.Rect(dic[graph_init][0][0], dic[graph_init][0][1] + 20, 18, 18)
 
-            # print(graph_init)
-            # print(graph_fin)
-            lugar_rect = pygame.rect.Rect(lugares[adulto.get_problem()][0][0], lugares[adulto.get_problem()][0][1], 5, 5)
-            jugador_rect = pygame.rect.Rect(dic[graph_init][0][0], dic[graph_init][0][1] + 20, 18, 18)
 
-            # print(lugar_rect[0], lugar_rect[1])
-
-            if pygame.Rect.colliderect(player_rect, adulto.get_rect()) and item is not False:
+            if pygame.Rect.colliderect(player_rect, adult.get_rect()) and item is not False:
+                ##WE MAKE THIS LOOP TO AVOID REPEATING SAME POSITIONS
                 while 1:
                     num = randint(1, 14)
                     if num == last:
@@ -482,22 +473,29 @@ if __name__ == '__main__':
                     else:
                         last = num
                         break
-                positions = posiciones[num]
-                adulto.change_pos(positions[0], positions[1])
-                adulto.change_problem(randint(1, 4))
-                adulto_sprite.add(adulto)
-                # graph_fin=positions[1]*965+positions[0]
-                # print(positions[1]*965+positions[0])
+                ##GET X AND Y POSITIONS
+                x_pos,y_pos = positions[num]
+                ##CHANGE POSITIONS
+                adult.change_pos(x_pos, y_pos)
+                ##CHANGE PROBLEM
+                adult.change_problem(randint(1, 4))
+                ##ADD AGAINT TO THE GROUP
+                adult_sprite.add(adult)
+                ##GET NEW PATH
                 path = graph1.a_star_algorithm(graph_init, graph_fin)
-                # help=False
+                ##SET ITEM FALSE, WE HAVE TO DO THE REQUEST AGAIN
                 item = False
-                my_tile = world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3])
+                ##GET TILE TARGET
+                my_tile = world.get_tile_by_index(places_of_interest[adult.get_problem()][0][2], places_of_interest[adult.get_problem()][0][3])
+                ##FILL TILE TARGET WITH RED COLOR
                 my_tile.set_target(True)
 
-            if pygame.Rect.colliderect(jugador_rect, lugar_rect) and moving is False:
-                print("colision", lugares[adulto.get_problem()][1])
+            if pygame.Rect.colliderect(play_rect, place_rect) and moving is False:
+                ##IF PLAYER AND PLACE COLLIDE, PLAYER CON GO WITH ADULT BY SETTING ITEM TO TRUE
+                print("colision", places_of_interest[adult.get_problem()][1])
                 item = True
-                my_tile = world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3])
+                ##GET TILE TARGET AND SETTING IT TO FALSE, TO RETURN TO THE ORIGINAL COLOR
+                my_tile = world.get_tile_by_index(places_of_interest[adult.get_problem()][0][2], places_of_interest[adult.get_problem()][0][3])
                 my_tile.set_target(False)
 
             if graph_visible:
@@ -513,11 +511,11 @@ if __name__ == '__main__':
             player1 = pixel_arr[int(player_x / 9) * sp_pl_x:int(player_x / 9) * (sp_pl_x + 1),
                       int(player_y / 4) * sp_pl_y:int(player_y / 4) * (sp_pl_y + 1)].make_surface()
             pygame.PixelArray.close(pixel_arr)
-            if len(adulto_sprite) != 0:
-                adulto_sprite.draw(screen)
+            if len(adult_sprite) != 0:
+                adult_sprite.draw(screen)
             #######
 
-            # cartel(screen,arial,textos[adulto.get_problem()])
+  
 
         pygame.display.update()
         clock.tick(40)
