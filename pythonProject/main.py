@@ -273,6 +273,7 @@ if __name__ == '__main__':
 
     land_surface = pygame.image.load('sprites/map.png')
     land_surface = pygame.transform.scale(land_surface, (W, H))
+    menu=pygame.image.load('sprites/start.png')
     pedido_supermercado = pygame.image.load('sprites/pedido_supermercado.png')
     pedido_nieto = pygame.image.load('sprites/pedido_nieto.png')
     pedido_farmacia = pygame.image.load('sprites/pedido_farmacia.png')
@@ -369,6 +370,8 @@ if __name__ == '__main__':
     path = path + path2
     follow = None
     item = False
+    start=True
+    game=False
 
     world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3]) \
         .set_target(True)
@@ -383,10 +386,11 @@ if __name__ == '__main__':
             moving = False
         # Events
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and moving is False:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and moving is False and game==True:
                 moving = True
                 temp = world.clicked_tile(event.pos[0], event.pos[1])
                 if temp is not None:
@@ -402,112 +406,118 @@ if __name__ == '__main__':
                         follow = path[0]
                         step = 5
                         ad = 1
+            if event.type == pygame.MOUSEBUTTONDOWN and game==False:
+                game=True
 
         # Show
-        screen.fill([255, 255, 255])
-        screen.blit(land_surface, (0, 0))
-        world.draw_world(screen)
-        screen.blit(player1, player_rect)
-        screen.blit(pedidos[adulto.get_problem()], (0, 670))
-
-        """
-        # Movement
-        # pos_x_pika += step
-        # pika_rect.left += step
-        """
-        if sp_pl_x < 8:
-            sp_pl_x += ad
+        if game ==False:
+            screen.blit(menu, (0, 0))
         else:
-            sp_pl_x = 0
-        if player_rect.centery < dic[follow][0][1] - step:
-            player_rect.centery += step
-            sp_pl_y = 2
-        elif player_rect.centery > dic[follow][0][1] + step:
-            player_rect.centery -= step
-            sp_pl_y = 0
-        elif player_rect.centerx < dic[follow][0][0] - step:
-            player_rect.centerx += step
-            sp_pl_y = 3
-        elif player_rect.centerx > dic[follow][0][0] + step:
-            player_rect.centerx -= step
-            sp_pl_y = 1
 
-        # Collision
-        """if player_rect.collidepoint(dic[follow][0]) and len(path) != 0:
-            path.pop(0)"""
-        if path is not None and (player_rect.centerx - step <= dic[follow][0][0] <= player_rect.centerx + step) and (
-                player_rect.centery - step <= dic[follow][0][1] <= player_rect.centery + step):
-            path.pop(0)
-            graph_init = graph_fin
+            screen.fill([255, 255, 255])
+            screen.blit(land_surface, (0, 0))
+            world.draw_world(screen)
+            screen.blit(player1, player_rect)
+            screen.blit(pedidos[adulto.get_problem()], (0, 670))
 
-        # if len(path)==0 & help==True:
-        #     while(1):
-        #         num=randint(1,3)
-        #         if(num==last):
-        #             continue
-        #         else:
-        #             last=num
-        #             break
-        #     positions=posiciones[randint(1,3)]
-        #     adulto.change_pos(positions[0],positions[1])
-        #     adulto_sprite.add(adulto)
-        #     graph_fin=positions[1]*965+positions[0]
-        #     print(positions[1]*965+positions[0])
-        #     path = graph1.a_star_algorithm(graph_init, graph_fin)
-        #     help=False
-        #     # adulto_sprite.add(adulto)
+            """
+            # Movement
+            # pos_x_pika += step
+            # pika_rect.left += step
+            """
+            if sp_pl_x < 8:
+                sp_pl_x += ad
+            else:
+                sp_pl_x = 0
+            if player_rect.centery < dic[follow][0][1] - step:
+                player_rect.centery += step
+                sp_pl_y = 2
+            elif player_rect.centery > dic[follow][0][1] + step:
+                player_rect.centery -= step
+                sp_pl_y = 0
+            elif player_rect.centerx < dic[follow][0][0] - step:
+                player_rect.centerx += step
+                sp_pl_y = 3
+            elif player_rect.centerx > dic[follow][0][0] + step:
+                player_rect.centerx -= step
+                sp_pl_y = 1
 
-        # print(graph_init)
-        # print(graph_fin)
-        lugar_rect = pygame.rect.Rect(lugares[adulto.get_problem()][0][0], lugares[adulto.get_problem()][0][1], 5, 5)
-        jugador_rect = pygame.rect.Rect(dic[graph_init][0][0], dic[graph_init][0][1] + 20, 18, 18)
+            # Collision
+            """if player_rect.collidepoint(dic[follow][0]) and len(path) != 0:
+                path.pop(0)"""
+            if path is not None and (player_rect.centerx - step <= dic[follow][0][0] <= player_rect.centerx + step) and (
+                    player_rect.centery - step <= dic[follow][0][1] <= player_rect.centery + step):
+                path.pop(0)
+                graph_init = graph_fin
 
-        # print(lugar_rect[0], lugar_rect[1])
+            # if len(path)==0 & help==True:
+            #     while(1):
+            #         num=randint(1,3)
+            #         if(num==last):
+            #             continue
+            #         else:
+            #             last=num
+            #             break
+            #     positions=posiciones[randint(1,3)]
+            #     adulto.change_pos(positions[0],positions[1])
+            #     adulto_sprite.add(adulto)
+            #     graph_fin=positions[1]*965+positions[0]
+            #     print(positions[1]*965+positions[0])
+            #     path = graph1.a_star_algorithm(graph_init, graph_fin)
+            #     help=False
+            #     # adulto_sprite.add(adulto)
 
-        if pygame.Rect.colliderect(player_rect, adulto.get_rect()) and item is not False:
-            while 1:
-                num = randint(1, 14)
-                if num == last:
-                    continue
-                else:
-                    last = num
-                    break
-            positions = posiciones[num]
-            adulto.change_pos(positions[0], positions[1])
-            adulto.change_problem(randint(1, 4))
-            adulto_sprite.add(adulto)
-            # graph_fin=positions[1]*965+positions[0]
-            # print(positions[1]*965+positions[0])
-            path = graph1.a_star_algorithm(graph_init, graph_fin)
-            # help=False
-            item = False
-            my_tile = world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3])
-            my_tile.set_target(True)
+            # print(graph_init)
+            # print(graph_fin)
+            lugar_rect = pygame.rect.Rect(lugares[adulto.get_problem()][0][0], lugares[adulto.get_problem()][0][1], 5, 5)
+            jugador_rect = pygame.rect.Rect(dic[graph_init][0][0], dic[graph_init][0][1] + 20, 18, 18)
 
-        if pygame.Rect.colliderect(jugador_rect, lugar_rect) and moving is False:
-            print("colision", lugares[adulto.get_problem()][1])
-            item = True
-            my_tile = world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3])
-            my_tile.set_target(False)
+            # print(lugar_rect[0], lugar_rect[1])
 
-        if graph_visible:
-            for i in range(shape_x * shape_y):
-                font = pygame.font.Font(None, 40)
-                text = font.render(str(i), False, 'black')
-                text_rect = text.get_rect(center=(200, 200))
-                pygame.draw.circle(screen, 'red', dic[i][0], 15)
-                screen.blit(text, (dic[i][0][0] - 10, dic[i][0][1] - 10))
+            if pygame.Rect.colliderect(player_rect, adulto.get_rect()) and item is not False:
+                while 1:
+                    num = randint(1, 14)
+                    if num == last:
+                        continue
+                    else:
+                        last = num
+                        break
+                positions = posiciones[num]
+                adulto.change_pos(positions[0], positions[1])
+                adulto.change_problem(randint(1, 4))
+                adulto_sprite.add(adulto)
+                # graph_fin=positions[1]*965+positions[0]
+                # print(positions[1]*965+positions[0])
+                path = graph1.a_star_algorithm(graph_init, graph_fin)
+                # help=False
+                item = False
+                my_tile = world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3])
+                my_tile.set_target(True)
 
-        #######
-        pixel_arr = pygame.PixelArray(player)
-        player1 = pixel_arr[int(player_x / 9) * sp_pl_x:int(player_x / 9) * (sp_pl_x + 1),
-                  int(player_y / 4) * sp_pl_y:int(player_y / 4) * (sp_pl_y + 1)].make_surface()
-        pygame.PixelArray.close(pixel_arr)
-        if len(adulto_sprite) != 0:
-            adulto_sprite.draw(screen)
-        #######
+            if pygame.Rect.colliderect(jugador_rect, lugar_rect) and moving is False:
+                print("colision", lugares[adulto.get_problem()][1])
+                item = True
+                my_tile = world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3])
+                my_tile.set_target(False)
 
-        # cartel(screen,arial,textos[adulto.get_problem()])
+            if graph_visible:
+                for i in range(shape_x * shape_y):
+                    font = pygame.font.Font(None, 40)
+                    text = font.render(str(i), False, 'black')
+                    text_rect = text.get_rect(center=(200, 200))
+                    pygame.draw.circle(screen, 'red', dic[i][0], 15)
+                    screen.blit(text, (dic[i][0][0] - 10, dic[i][0][1] - 10))
+
+            #######
+            pixel_arr = pygame.PixelArray(player)
+            player1 = pixel_arr[int(player_x / 9) * sp_pl_x:int(player_x / 9) * (sp_pl_x + 1),
+                      int(player_y / 4) * sp_pl_y:int(player_y / 4) * (sp_pl_y + 1)].make_surface()
+            pygame.PixelArray.close(pixel_arr)
+            if len(adulto_sprite) != 0:
+                adulto_sprite.draw(screen)
+            #######
+
+            # cartel(screen,arial,textos[adulto.get_problem()])
 
         pygame.display.update()
         clock.tick(40)
