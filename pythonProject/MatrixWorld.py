@@ -9,12 +9,14 @@ BG_COLOR = (40, 40, 40)
 LIGHT_GREY = (100, 100, 100)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
+BLUE = (0, 0, 255)
 
 
 # element de la matrix
 class WorldTile:
     def __init__(self, _is_wall):
         self.isWall = _is_wall  # casa
+        self.isTarget = False
         self.value = 1  # 1 is path, 0 is walled
         self.x_pos = 0
         self.y_pos = 0
@@ -26,8 +28,17 @@ class WorldTile:
     def set_wall(self, _is_wall):
         self.isWall = _is_wall
 
+    def set_target(self, is_target):
+        self.isTarget = is_target
+
     def tile_center(self):
         return self.x_pos + (TILE_SIZE / 2), self.y_pos + (TILE_SIZE / 2)
+
+    def draw_tile(self, surface):
+        if self.isTarget:
+            pg.draw.rect(surface, RED, [self.x_pos, self.y_pos - TILE_SIZE, TILE_SIZE, TILE_SIZE], 1)
+        elif not self.isWall:
+            pg.draw.rect(surface, BLACK, [self.x_pos, self.y_pos - TILE_SIZE, TILE_SIZE, TILE_SIZE], 1)
 
 
 # Matrix
@@ -61,20 +72,25 @@ class World:
     def draw_world(self, surface):
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
-                if self.matrix[i][j].isWall:
-                    continue
-                    # pg.draw.rect(surface, LIGHT_GREY,
-                    #              [self.matrix[i][j].x_pos, self.matrix[i][j].y_pos - TILE_SIZE, TILE_SIZE, TILE_SIZE], 1)
-                else:
-                    pg.draw.rect(surface, BLACK,
-                                 [self.matrix[i][j].x_pos, self.matrix[i][j].y_pos - TILE_SIZE, TILE_SIZE, TILE_SIZE], 1)
+                self.matrix[i][j].draw_tile(surface)
 
-    def clicked_tile(self, event):
+    def clicked_tile(self, x, y):
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
                 temp = self.matrix[i][j]
-                if temp.x_pos <= event.pos[0] < temp.x_pos + TILE_SIZE \
-                        and temp.y_pos - TILE_SIZE <= event.pos[1] < temp.y_pos - TILE_SIZE + TILE_SIZE:
+                if temp.x_pos <= x < temp.x_pos + TILE_SIZE \
+                        and temp.y_pos - TILE_SIZE <= y < temp.y_pos - TILE_SIZE + TILE_SIZE:
                     return i, j
         return None
-        # temp.set_wall(True)
+
+    def get_tile(self, x, y):
+        for i in range(len(self.matrix)):
+            for j in range(len(self.matrix[i])):
+                temp = self.matrix[i][j]
+                if temp.x_pos <= x < temp.x_pos + TILE_SIZE \
+                        and temp.y_pos - TILE_SIZE <= y < temp.y_pos - TILE_SIZE + TILE_SIZE:
+                    return self.matrix[i][j]
+        return None
+
+    def get_tile_by_index(self, x, y):
+        return self.matrix[x][y]
