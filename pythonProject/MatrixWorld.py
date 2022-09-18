@@ -36,9 +36,9 @@ class WorldTile:
 
     def draw_tile(self, surface):
         if self.isTarget:
-            pg.draw.rect(surface, RED, [self.x_pos, self.y_pos - TILE_SIZE, TILE_SIZE, TILE_SIZE], 1)
+            pg.draw.rect(surface, RED, [self.x_pos, self.y_pos - TILE_SIZE, TILE_SIZE, TILE_SIZE])
         elif not self.isWall:
-            pg.draw.rect(surface, BLACK, [self.x_pos, self.y_pos - TILE_SIZE, TILE_SIZE, TILE_SIZE], 1)
+            pg.draw.rect(surface, BLACK, [self.x_pos, self.y_pos - TILE_SIZE, TILE_SIZE, TILE_SIZE], 3)
 
 
 # Matrix

@@ -369,6 +369,10 @@ if __name__ == '__main__':
     path = path + path2
     follow = None
     item = False
+
+    world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3]) \
+        .set_target(True)
+
     while True:
         # Follow
         if path:
@@ -459,34 +463,32 @@ if __name__ == '__main__':
         jugador_rect = pygame.rect.Rect(dic[graph_init][0][0], dic[graph_init][0][1] + 20, 18, 18)
 
         # print(lugar_rect[0], lugar_rect[1])
-        world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3])\
-            .set_target(True)
 
         if pygame.Rect.colliderect(player_rect, adulto.get_rect()) and item is not False:
             while 1:
-                num = randint(1, 15)
+                num = randint(1, 14)
                 if num == last:
                     continue
                 else:
                     last = num
                     break
-            positions = posiciones[randint(1, 15)]
+            positions = posiciones[num]
             adulto.change_pos(positions[0], positions[1])
-            adulto.change_problem(randint(1, 3))
+            adulto.change_problem(randint(1, 4))
             adulto_sprite.add(adulto)
             # graph_fin=positions[1]*965+positions[0]
             # print(positions[1]*965+positions[0])
             path = graph1.a_star_algorithm(graph_init, graph_fin)
             # help=False
             item = False
+            my_tile = world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3])
+            my_tile.set_target(True)
 
         if pygame.Rect.colliderect(jugador_rect, lugar_rect) and moving is False:
             print("colision", lugares[adulto.get_problem()][1])
             item = True
             my_tile = world.get_tile_by_index(lugares[adulto.get_problem()][0][2], lugares[adulto.get_problem()][0][3])
             my_tile.set_target(False)
-            my_tile.draw_tile(screen)
-
 
         if graph_visible:
             for i in range(shape_x * shape_y):
