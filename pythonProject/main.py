@@ -315,24 +315,13 @@ if __name__ == '__main__':
     # Variable
     ##WE ARE GONNA USE THIS VARIABLE FOR CONDITIONAL PURPOSES, WE CANT ANALIZE COLLISIONS IF THE PLAYER IS MOVING
     moving = False
-    # Dimensions
 
-    #########################
-    # Matrix
-    # shape_x = int(W/(player_x/9))
-    # shape_y = int(H/(player_y/4))
-    """
-        # Change
-        # shape_x = W
-        # shape_y = H
-    """
-    # shape_x = shape_x
-    # shape_y = shape_y
+    ## THIS IS GOING TO BE OUR STRUCTURE TO SAVE OUR NODES AND THEIR POSITIONS
+    ## AND WE'RE GOING TO UES THE ITERATE y_temp FOR THE SAME PURPOSE TO HAVE ALL THE POSITIONS OF THE MATRIX
     dic = {}
     y_temp = -1
     # Graph
-
-    
+    ## WE SAVE THE WIDTH AND HEIGHT OF ONE TILE IN THE MAP
     each_shape_x = W / shape_x
     each_shape_y = H / shape_y
 
@@ -340,37 +329,36 @@ if __name__ == '__main__':
         x_temp = (i % shape_x)
         if x_temp == 0:
             y_temp += 1
-        # y_temp = int(i / shape_y)
-        """dic[i] = [(int(player_x/18) + int(player_x/9) * x_temp,
-                   int(player_y/8) + int(player_y/4) * y_temp)
-            , (y_temp, x_temp)]"""
+        ## WITH A SIMPLE LOGIC WE DISTRIBUTE ALL THE POSITIONS OF THE CENTER OF THE TILES
+        ## WITH THE POSITIONS OF THE PIXEL IN THE MAP
         dic[i] = [(int(each_shape_x / 2) + int(each_shape_x) * x_temp,
                    int(each_shape_y / 2) + int(each_shape_y) * y_temp)
             , (y_temp, x_temp)]
 
-        # Change
-        """dic[i] = [(x_temp, y_temp), (y_temp, x_temp)]"""
-    """
-    for i in range(N):
-        c = 150
-        x_temp = (i % div)
-        y_temp = int(i / div)
-        dic[i] = (40 + c * x_temp, 40 + c * y_temp)
-    """
+    ## WE USE THIS VARIABLE TO SHOW THE GRAPH IN RUN-TIME OF THE PROGRAM
+    ## BUT FOR THE HIGH AMOUNT OF NODES IN OUR GRAPH WE ARE NOT GONIG TO SET IT TRUE THIS VARIABLE
     graph_visible = False
 
+    ## WE'RE GOING TO USE THIS VARIABLES TO ITERATE THE IMAGE OF THE PLAYER AND
+    ## GIVE HIM ANIMATION
     sp_pl_x = 0
     sp_pl_y = 0
 
+    ## WE USE THIS PART OF THE CODE TO SPLIT THE IMAGE IN 36 PARTS TO GIVE ANIMATION TO THE PLAYER
     pixel_arr = pygame.PixelArray(player)
+    ## AGAIN, WE USE A SIMPLE MATH LOGIC TO GIVE HIM CORRECT POSITIONS
+    ## BUT FIRST WE NEED TO TREAT IT AS A MATRIX AND CONVERT IT TO A SURFACE
     player1 = pixel_arr[int(player_x / 9) * sp_pl_x:int(player_x / 9) * (sp_pl_x + 1),
               int(player_y / 4) * sp_pl_y:int(player_y / 4) * (sp_pl_y + 1) + 10].make_surface()
     player_rect = player1.get_rect(midbottom=(dic[graph_init][0][0], dic[graph_init][0][1] + 20))
     pygame.PixelArray.close(pixel_arr)
     ##########################
+    ## SPPED OF THE PLAYER
     step = 2
+    ## TO INTERPOLATE THE DIVISIONS OF THE IMAGE
     ad = 1
 
+    ## FIRST VERSION OF THE FOLLOWED PATH
     path2 = path[::-1]
     path = path + path2
     follow = None
@@ -385,13 +373,17 @@ if __name__ == '__main__':
         .set_target(True)
 
     while True:
+        ## WE START TO GIVE HIM TO THE PLAYER THE FIRST POSITION TO FOLLOW IF THE PATH HAS CONTENT
         # Follow
         if path:
             follow = path[0]
+        ## WE'RE GOING TO SET THE STEP TO 0 TO AVOID THE ANIMATION
         else:
             step = 0
             ad = 0
             moving = False
+
+        ## THIS PART OF THE CODE CONTAIN OR MANAGE ALL THE EVENTS IN THE GAME
         # Events
         for event in pygame.event.get():
 
@@ -429,11 +421,7 @@ if __name__ == '__main__':
             screen.blit(player1, player_rect)
             screen.blit(requests[adult.get_problem()], (0, 670))
 
-            """
-            # Movement
-            # pos_x_pika += step
-            # pika_rect.left += step
-            """
+            ## THIS PART OF THE CODE IS TO GIVE HIM ANIMATION TO THE PLAYER IN BASE OF THE INDEX AS A RESUSLT OF THE MATH SPLIT OF THE IMAGE
             if sp_pl_x < 8:
                 sp_pl_x += ad
             else:
@@ -452,8 +440,6 @@ if __name__ == '__main__':
                 sp_pl_y = 1
 
             # Collision
-            """if player_rect.collidepoint(dic[follow][0]) and len(path) != 0:
-                path.pop(0)"""
             if path is not None and (player_rect.centerx - step <= dic[follow][0][0] <= player_rect.centerx + step) and (
                     player_rect.centery - step <= dic[follow][0][1] <= player_rect.centery + step):
                 path.pop(0)
@@ -498,15 +484,8 @@ if __name__ == '__main__':
                 my_tile = world.get_tile_by_index(places_of_interest[adult.get_problem()][0][2], places_of_interest[adult.get_problem()][0][3])
                 my_tile.set_target(False)
 
-            if graph_visible:
-                for i in range(shape_x * shape_y):
-                    font = pygame.font.Font(None, 40)
-                    text = font.render(str(i), False, 'black')
-                    text_rect = text.get_rect(center=(200, 200))
-                    pygame.draw.circle(screen, 'red', dic[i][0], 15)
-                    screen.blit(text, (dic[i][0][0] - 10, dic[i][0][1] - 10))
-
             #######
+            ## THIS PART IS FOR UPDATE THE PART SHOWN OF THE IMAGE
             pixel_arr = pygame.PixelArray(player)
             player1 = pixel_arr[int(player_x / 9) * sp_pl_x:int(player_x / 9) * (sp_pl_x + 1),
                       int(player_y / 4) * sp_pl_y:int(player_y / 4) * (sp_pl_y + 1)].make_surface()
